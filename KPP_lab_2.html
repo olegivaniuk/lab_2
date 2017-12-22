@@ -1,0 +1,57 @@
+<html>
+  <head>
+	<meta charset="UTF-8">
+    <title>KPP Lab 2</title>
+  </head>
+  <body>
+    <h1>Tasks</h1>
+
+    <ul id="tasks"></ul>
+
+    <input id="new_task_name" type="text" name="task" />
+    <button onclick="createTask()">Create</button>
+
+    <script>
+function loadTasks() {
+  fetch('http://localhost:3001/tasks')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(tasks) {
+    var html = '';
+    for (var i = 0, len = tasks.length; i < len; i++) {
+      var task = tasks[i];
+      var destroyButton = '<button onclick="destroyTask(\'' + task._id + '\')">DELETE</button>';
+      html += '<li>' + tasks[i].name + ' ' + destroyButton + '</li>';
+    }
+    document.getElementById('tasks').innerHTML = html;
+  });
+};
+
+
+function destroyTask(id) {
+  fetch('http://localhost:3001/tasks/' + id, {
+    method: 'delete'
+  })
+  .then(loadTasks());
+}
+
+function createTask() {
+  var taskName = document.getElementById('new_task_name').value;
+  fetch('http://localhost:3001/tasks', 
+    {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({name: taskName})
+    })
+  .then(loadTasks());
+
+  return false;
+};
+
+loadTasks();
+	</script>
+  </body>
+</html>
